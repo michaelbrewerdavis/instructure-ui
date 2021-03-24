@@ -278,5 +278,49 @@ describe('<TreeCollection />', async () => {
       const item3 = await collection.find('button:contains(Item 3)')
       expect(await item3.find('svg:title(Document icon)')).to.exist()
     })
+
+    it('should correctly evaluate `getCollectionProps` for each collection', async () => {
+      await mount(
+        <TreeCollection
+          id={1}
+          name="Coll 1"
+          collections={[
+            {
+              id: 1,
+              name: 'Coll 1',
+              descriptor: 'Descripor',
+              collections: [2, 3]
+            },
+            { id: 2, name: 'Coll 2', descriptor: 'Another Descriptor' },
+            { id: 3, name: 'Coll 3', descriptor: 'Yet Another Descriptor' }
+          ]}
+          getCollectionProps={({ name, ...props }) => {
+            let collectionIcon = IconDocument
+
+            if (name === 'Coll 2') {
+              collectionIcon = IconFolder
+            }
+
+            if (name === 'Coll 3') {
+              collectionIcon = IconUser
+            }
+
+            return {
+              ...props,
+              collectionIcon,
+              name
+            }
+          }}
+          expanded={true}
+        />
+      )
+      const collection = await TreeCollectionLocator.find()
+
+      const collection1 = await collection.find('li:contains(Coll 2)')
+      expect(await collection1.find('svg:title(Folder icon)')).to.exist()
+
+      const collection2 = await collection.find('li:contains(Coll 3)')
+      expect(await collection2.find('svg:title(User icon)')).to.exist()
+    })
   })
 })

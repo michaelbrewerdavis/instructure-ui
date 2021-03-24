@@ -94,9 +94,16 @@ class TreeBrowser extends Component {
     ]),
     itemIcon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
     /**
+     * A function called with each collection's props as an argument.  The return value of this function
+     * is a props object which will be passed to the collection when it is rendered.  This is useful for
+     * situations where you need to render the collection differently depending on its props.  For example,
+     * if you would like to display a different icon for collections with a certain name
+     */
+    getCollectionProps: PropTypes.func,
+    /**
      * A function called with each item's props as an argument. The return value of this function is a
      * props object which will be passed to the item when it is rendered. This is useful for situations where
-     * you need to render the item differently depending on it's props. For example, if you would like to
+     * you need to render the item differently depending on its props. For example, if you would like to
      * display a different icon for items with a certain name.
      */
     getItemProps: PropTypes.func,
@@ -121,6 +128,7 @@ class TreeBrowser extends Component {
     collectionIcon: IconFolderLine,
     collectionIconExpanded: IconFolderLine,
     itemIcon: IconDocumentLine,
+    getCollectionProps: (props) => props,
     getItemProps: (props) => props,
     defaultExpanded: [],
     selectionType: 'none',
@@ -328,7 +336,7 @@ class TreeBrowser extends Component {
     const collections = [].concat(collection.collections || [])
 
     return collections
-      .map((id) => this.getCollectionProps(this.props.collections[id]))
+      .map((id) => this.getTreeCollectionProps(this.props.collections[id]))
       .filter((collection) => collection != null)
   }
 
@@ -346,7 +354,7 @@ class TreeBrowser extends Component {
     }
   }
 
-  getCollectionProps(collection) {
+  getTreeCollectionProps(collection) {
     return {
       id: collection.id,
       name: collection.name,
@@ -369,7 +377,7 @@ class TreeBrowser extends Component {
       <TreeCollection
         key={i}
         {...pickProps(this.props, TreeCollection.propTypes)}
-        {...this.getCollectionProps(collection)}
+        {...this.getTreeCollectionProps(collection)}
         selection={this.state.selection}
         onItemClick={this.handleItemClick}
         onCollectionClick={this.handleCollectionClick}

@@ -141,42 +141,73 @@ You can also specify a different icon for each item if needed. To do this, use `
 ```js
 ---
 example: true
+render: false
 ---
-<TreeBrowser
-  collections={{
-    1: {
-      id: 1,
-      name: "Saved",
-      collections: [],
-      items: [1,2,3]
-    },
-  }}
-  items={{
-    1: { id: 1, name: "Modules" },
-    2: { id: 2, name: "Videos" },
-    3: { id: 3, name: "Students" }
-  }}
-  defaultExpanded={[1]}
-  rootId={1}
-  size="large"
-  getItemProps={({ name, ...props }) => {
-    let itemIcon = IconUserSolid
+const collections = {
+  1: {
+    id: 1,
+    name: "All Files",
+    collections: [2,3],
+    items: []
+  },
+  2: {
+    id: 2,
+    name: "Saved",
+    collections: [],
+    items: [1,2],
+    customIcon: IconPublishLine
+  },
+  3: {
+    id: 3,
+    name: "Not Saved",
+    collections: [],
+    items: [3],
+    customIcon: IconWarningLine
+  }
+}
 
-    if (name === 'Modules') {
-      itemIcon = IconModuleLine
-    }
+const items = {
+  1: { id: 1, name: "Modules" },
+  2: { id: 2, name: "Videos" },
+  3: { id: 3, name: "Students" }
+}
 
-    if (name === 'Videos') {
-      itemIcon = IconVideoLine
-    }
+const Example =() => (
+  <TreeBrowser
+    collections={collections}
+    items={items}
+    defaultExpanded={[1, 2]}
+    rootId={1}
+    size="large"
+    getItemProps={props => {
+      const {name} = props
+      let itemIcon = IconUserSolid
 
+      if (name === 'Modules') {
+        itemIcon = IconModuleLine
+      }
+
+      if (name === 'Videos') {
+        itemIcon = IconVideoLine
+      }
+
+      return {
+        ...props, // Be sure to pass the rest of the props along
+        itemIcon
+      }
+    }}
+  getCollectionProps={props => {
+    const {id, collectionIcon, collectionIconExpanded} = props
+    const customIcon = collections[id]?.customIcon
     return {
-      ...props, // Be sure to pass the rest of the props along
-      itemIcon,
-      name
+      ...props,
+      collectionIcon: customIcon || collectionIcon,
+      collectionIconExpanded: customIcon || collectionIconExpanded
     }
   }}
-/>
+  />
+)
+render(<Example />)
 ```
 
 ### Thumbnails

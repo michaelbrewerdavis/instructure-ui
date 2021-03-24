@@ -66,6 +66,7 @@ class TreeCollection extends Component {
       PropTypes.func
     ]),
     itemIcon: PropTypes.oneOfType([PropTypes.node, PropTypes.func]),
+    getCollectionProps: PropTypes.func,
     getItemProps: PropTypes.func,
     onItemClick: PropTypes.func,
     onCollectionClick: PropTypes.func,
@@ -100,6 +101,7 @@ class TreeCollection extends Component {
     collectionIconExpanded: undefined,
     collectionIcon: undefined,
     itemIcon: undefined,
+    getCollectionProps: (props) => props,
     getItemProps: (props) => props,
     numChildren: undefined,
     level: undefined,
@@ -349,8 +351,10 @@ class TreeCollection extends Component {
       expanded,
       collectionIcon,
       collectionIconExpanded,
+      containerRef,
       level,
-      position
+      position,
+      getCollectionProps
     } = this.props
 
     const classes = {
@@ -365,6 +369,17 @@ class TreeCollection extends Component {
     if (this.props.selection)
       ariaSelected['aria-selected'] =
         this.props.selection === `collection_${id}`
+
+    const collectionProps = getCollectionProps({
+      ...this.getCommonButtonProps(),
+      expanded,
+      collectionIcon,
+      collectionIconExpanded,
+      type: 'collection',
+      containerRef,
+      selected: this.props.selection === `collection_${id}`,
+      focused: this.state.focused === `collection_${id}`
+    })
 
     return (
       <li
@@ -382,16 +397,7 @@ class TreeCollection extends Component {
         onBlur={(e, n) => this.handleBlur(e, { id: id, type: 'collection' })}
         {...ariaSelected}
       >
-        <TreeButton
-          {...this.getCommonButtonProps()}
-          expanded={expanded}
-          collectionIcon={collectionIcon}
-          collectionIconExpanded={collectionIconExpanded}
-          type="collection"
-          containerRef={this.props.containerRef}
-          selected={this.props.selection === `collection_${id}`}
-          focused={this.state.focused === `collection_${id}`}
-        />
+        <TreeButton {...collectionProps} />
         {this.renderChildren()}
       </li>
     )
